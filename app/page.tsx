@@ -6,6 +6,7 @@ import { Task } from '@/types/tasks'
 import { Calendar } from '@/components/Calendar'
 import { TasksList } from '@/components/TasksList'
 import { ProgressDashboard } from '@/components/ProgressDashboard'
+import { NotesSection } from '@/components/NotesSection'
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -84,7 +85,7 @@ export default function Home() {
         </div>
 
         {/* Main content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           {/* Calendar */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
@@ -104,6 +105,11 @@ export default function Home() {
               onTaskUpdate={handleTaskUpdate}
             />
           </div>
+        </div>
+
+        {/* Study Notes Section */}
+        <div className="mb-12">
+          <NotesSection />
         </div>
       </div>
     </main>

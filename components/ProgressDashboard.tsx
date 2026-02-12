@@ -32,91 +32,105 @@ export function ProgressDashboard({ tasks }: ProgressDashboardProps) {
     {} as Record<string, { total: number; completed: number }>
   )
 
-  return (
-    <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 rounded-2xl shadow-2xl p-8 border border-purple-500/20">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Study Progress
-        </h2>
-        <p className="text-purple-200/60 text-sm mt-1">Track your journey through the LLM study plan</p>
-      </div>
+  // ... existing calculation logic ...
 
-      {/* Main progress cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Tasks progress */}
-        <div className="bg-gradient-to-br from-blue-900/40 to-blue-800/20 rounded-xl p-6 border border-blue-500/30 backdrop-blur-sm hover:border-blue-500/50 transition">
-          <div className="flex items-end justify-between mb-4">
-            <span className="text-sm font-semibold text-blue-300">Tasks Completed</span>
-            <span className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+  return (
+    <div className="relative overflow-hidden glass-card rounded-3xl p-8 md:p-12 border border-white/10 group">
+      {/* Background Glows */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[128px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[96px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+      
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+        
+        {/* Left: Text & Key Metrics */}
+        <div className="flex-1 space-y-8 text-center md:text-left">
+          <div>
+            <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 tracking-tight drop-shadow-lg">
+              Mission Status
+            </h2>
+            <p className="text-blue-200/60 font-mono text-sm tracking-widest uppercase mt-2">
+              Deep Learning Trajectory • Phase 1
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="glass-panel p-4 rounded-2xl flex flex-col items-center md:items-start border border-white/5 hover:border-purple-500/30 transition-colors duration-500">
+              <span className="text-xs font-mono text-purple-300/50 uppercase">Tasks Completed</span>
+              <span className="text-3xl font-bold text-white mt-1">{completedTasks} <span className="text-sm text-slate-500 font-normal">/ {totalTasks}</span></span>
+            </div>
+            <div className="glass-panel p-4 rounded-2xl flex flex-col items-center md:items-start border border-white/5 hover:border-blue-500/30 transition-colors duration-500">
+              <span className="text-xs font-mono text-blue-300/50 uppercase">Hours Logged</span>
+              <span className="text-3xl font-bold text-white mt-1">{completedHours.toFixed(1)}h <span className="text-sm text-slate-500 font-normal">/ {totalHours.toFixed(0)}h</span></span>
+            </div>
+          </div>
+        </div>
+
+        {/* Center: The "Core" (Circular HUD) */}
+        <div className="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0 flex items-center justify-center">
+          {/* Outer Rotating Ring (Decorative) */}
+          <div className="absolute inset-0 rounded-full border border-dashed border-white/10 animate-[spin_12s_linear_infinite]" />
+          
+          {/* Inner Glowing Ring (Progress) */}
+          <svg className="w-full h-full -rotate-90 transform drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+            <circle
+              cx="50%"
+              cy="50%"
+              r="46%"
+              className="stroke-slate-800/50"
+              strokeWidth="12"
+              fill="none"
+            />
+            <circle
+              cx="50%"
+              cy="50%"
+              r="46%"
+              className="stroke-purple-500 transition-all duration-1000 ease-out"
+              strokeWidth="12"
+              fill="none"
+              strokeDasharray={2 * Math.PI * 147} // approx r=46% of 320px container
+              strokeDashoffset={2 * Math.PI * 147 * (1 - overallProgress / 100)}
+              strokeLinecap="round"
+            />
+          </svg>
+
+          {/* Central Percent Display */}
+          <div className="absolute flex flex-col items-center justify-center text-center">
+            <span className="text-6xl font-black text-white tracking-tighter drop-shadow-2xl">
               {Math.round(overallProgress)}%
             </span>
-          </div>
-          <div className="w-full bg-blue-900/30 rounded-full h-3 border border-blue-500/20">
-            <div
-              className="bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-400 h-3 rounded-full transition-all duration-500 shadow-lg shadow-blue-500/50"
-              style={{ width: `${overallProgress}%` }}
-            />
-          </div>
-          <p className="text-xs text-blue-300/80 mt-3">
-            <span className="font-semibold">{completedTasks}</span> of <span className="font-semibold">{totalTasks}</span> tasks
-          </p>
-        </div>
-
-        {/* Hours progress */}
-        <div className="bg-gradient-to-br from-purple-900/40 to-purple-800/20 rounded-xl p-6 border border-purple-500/30 backdrop-blur-sm hover:border-purple-500/50 transition">
-          <div className="flex items-end justify-between mb-4">
-            <span className="text-sm font-semibold text-purple-300">Hours Completed</span>
-            <span className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              {Math.round(hoursProgress)}%
+            <span className="text-xs text-purple-300/70 font-mono tracking-widest mt-1 uppercase">
+              Completion
             </span>
           </div>
-          <div className="w-full bg-purple-900/30 rounded-full h-3 border border-purple-500/20">
-            <div
-              className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-400 h-3 rounded-full transition-all duration-500 shadow-lg shadow-purple-500/50"
-              style={{ width: `${hoursProgress}%` }}
-            />
-          </div>
-          <p className="text-xs text-purple-300/80 mt-3">
-            <span className="font-semibold">{completedHours.toFixed(1)}h</span> of <span className="font-semibold">{totalHours.toFixed(1)}h</span>
-          </p>
         </div>
-      </div>
 
-      {/* Category breakdown */}
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-xl p-6 border border-slate-700/50 backdrop-blur-sm">
-        <h3 className="font-semibold text-slate-100 mb-5 text-sm uppercase tracking-wider">Progress by Category</h3>
-        <div className="space-y-4">
+        {/* Right: Category "Data Stream" */}
+        <div className="w-full md:w-64 space-y-3">
+          <h3 className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-4 border-b border-white/10 pb-2">
+            Module Breakdown
+          </h3>
           {Object.entries(categoryStats)
             .sort((a, b) => b[1].total - a[1].total)
+            .slice(0, 5) // Show top 5
             .map(([category, stats], idx) => {
               const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0
-              const colors = [
-                'from-blue-500 to-cyan-500',
-                'from-purple-500 to-pink-500',
-                'from-emerald-500 to-teal-500',
-                'from-orange-500 to-yellow-500',
-                'from-rose-500 to-pink-500',
-                'from-indigo-500 to-purple-500',
-              ]
-              const colorClass = colors[idx % colors.length]
               return (
-                <div key={category} className="group">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-slate-300 group-hover:text-slate-100 transition">{category}</span>
-                    <span className="text-xs font-semibold text-slate-400">
-                      {stats.completed}/{stats.total}
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-700/50 rounded-full h-2.5 overflow-hidden border border-slate-600/50">
-                    <div
-                      className={`bg-gradient-to-r ${colorClass} h-2.5 rounded-full transition-all duration-500 shadow-lg`}
-                      style={{ width: `${progress}%` }}
-                    />
+                <div key={category} className="group/item flex items-center justify-between text-sm py-1">
+                  <span className="text-slate-400 group-hover/item:text-white transition-colors truncate max-w-[100px]">{category}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-slate-500 group-hover/item:bg-white transition-all duration-500 shadow-[0_0_10px_rgba(255,255,255,0.3)]"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <span className="font-mono text-xs text-slate-600 w-8 text-right">{Math.round(progress)}%</span>
                   </div>
                 </div>
               )
             })}
         </div>
+
       </div>
     </div>
   )
